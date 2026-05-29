@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalcuLuxe™ - Premium Mathematics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .tier-display {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tier-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .tier-badge.free {
+            background: #333;
+            color: #888;
+        }
+
+        .tier-badge.basic {
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            color: #333;
+        }
+
+        .tier-badge.premium {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+        }
+
+        .tier-badge.diamond {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #fff;
+        }
+
+        .tier-badge.active {
+            border-color: #fff;
+            transform: scale(1.1);
+        }
+
+        .calculator {
+            background: #252540;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .display {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .expression {
+            color: #888;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .result {
+            font-size: 2.5rem;
+            font-weight: 300;
+            word-break: break-all;
+        }
+
+        .result.approximate {
+            color: #ff6b6b;
+        }
+
+        .result.precise {
+            color: #4ade80;
+        }
+
+        .precision-indicator {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+
+        .precision-indicator.low {
+            background: #ff6b6b33;
+            color: #ff6b6b;
+        }
+
+        .precision-indicator.medium {
+            background: #fbbf2433;
+            color: #fbbf24;
+        }
+
+        .precision-indicator.high {
+            background: #4ade8033;
+            color: #4ade80;
+        }
+
+        .precision-indicator.perfect {
+            background: #00d4ff33;
+            color: #00d4ff;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 20px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.number {
+            background: #3a3a5a;
+            color: #fff;
+        }
+
+        .btn.number:hover {
+            background: #4a4a6a;
+        }
+
+        .btn.operator {
+            background: #5a4a8a;
+            color: #fff;
+        }
+
+        .btn.operator:hover {
+            background: #6a5a9a;
+        }
+
+        .btn.equals {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+            font-weight: 700;
+        }
+
+        .btn.clear {
+            background: #ff6b6b;
+            color: #fff;
+        }
+
+        .btn.locked {
+            position: relative;
+            opacity: 0.5;
+        }
+
+        .btn.locked::after {
+            content: '🔒';
+            position: absolute;
+            font-size: 0.8rem;
+            top: 2px;
+            right: 5px;
+        }
+
+        .upgrade-prompt {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffd70022, #ffaa0022);
+            border: 1px solid #ffd70055;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .upgrade-prompt h3 {
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .upgrade-prompt p {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .features-table {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
+            background: #252540;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .features-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .features-table th,
+        .features-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #3a3a5a;
+        }
+
+        .features-table th {
+            background: #1a1a2e;
+            font-weight: 600;
+        }
+
+        .features-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .features-table td:first-child {
+            text-align: left;
+        }
+
+        .check {
+            color: #4ade80;
+        }
+
+        .cross {
+            color: #ff6b6b;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .popup.active {
+            display: flex;
+        }
+
+        .popup-content {
+            background: #252540;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .popup-content h2 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .popup-content p {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .popup-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .popup-btn.upgrade {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+            font-weight: 600;
+        }
+
+        .popup-btn.cancel {
+            background: #3a3a5a;
+            color: #fff;
+        }
+
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .stats {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat {
+            background: #252540;
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .ad-banner {
+            margin-top: 20px;
+            padding: 15px;
+            background: repeating-linear-gradient(
+                45deg,
+                #ff6b6b22,
+                #ff6b6b22 10px,
+                #ff6b6b11 10px,
+                #ff6b6b11 20px
+            );
+            border: 2px dashed #ff6b6b;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 380px;
+        }
+
+        .ad-banner.hidden {
+            display: none;
+        }
+
+        .decimal-blur {
+            filter: blur(4px);
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CalcuLuxe™</h1>
+        <p>Where precision is a privilege</p>
+    </div>
+
+    <div class="tier-display">
+        <div class="tier-badge free active" onclick="setTier('free')">Free</div>
+        <div class="tier-badge basic" onclick="setTier('basic')">Basic $2.99</div>
+        <div class="tier-badge premium" onclick="setTier('premium')">Premium $9.99</div>
+        <div class="tier-badge diamond" onclick="setTier('diamond')">Diamond $49.99</div>
+    </div>
+
+    <div class="calculator">
+        <div class="display">
+            <div class="expression" id="expression"></div>
+            <div class="result" id="result">0</div>
+            <div class="precision-indicator low" id="precision">±50% accuracy</div>
+        </div>
+        <div class="buttons">
+            <button class="btn clear" onclick="clearCalc()">C</button>
+            <button class="btn operator locked" onclick="handleOperator('(')" id="paren1">(</button>
+            <button class="btn operator locked" onclick="handleOperator(')')" id="paren2">)</button>
+            <button class="btn operator" onclick="handleOperator('÷')">÷</button>
+            
+            <button class="btn number" onclick="handleNumber('7')">7</button>
+            <button class="btn number" onclick="handleNumber('8')">8</button>
+            <button class="btn number" onclick="handleNumber('9')">9</button>
+            <button class="btn operator" onclick="handleOperator('×')">×</button>
+            
+            <button class="btn number" onclick="handleNumber('4')">4</button>
+            <button class="btn number" onclick="handleNumber('5')">5</button>
+            <button class="btn number" onclick="handleNumber('6')">6</button>
+            <button class="btn operator" onclick="handleOperator('-')">-</button>
+            
+            <button class="btn number" onclick="handleNumber('1')">1</button>
+            <button class="btn number" onclick="handleNumber('2')">2</button>
+            <button class="btn number" onclick="handleNumber('3')">3</button>
+            <button class="btn operator" onclick="handleOperator('+')">+</button>
+            
+            <button class="btn number locked" onclick="handleNumber('0')" id="zero">0</button>
+            <button class="btn number locked" onclick="handleDecimal()" id="decimal">.</button>
+            <button class="btn operator locked" onclick="handleOperator('%')" id="percent">%</button>
+            <button class="btn equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <div class="upgrade-prompt" id="upgradePrompt">
+        <h3>Limited Time Offer!</h3>
+        <p>Upgrade now and get <strong>2 extra decimal places FREE!</strong></p>
+    </div>
+
+    <div class="ad-banner" id="adBanner">
+        <p><strong>AD:</strong> Tired of wrong answers? Try CalcuLuxe Premium!</p>
+        <p style="font-size: 0.8rem; color: #888;">Skip ads for just $4.99/month</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-value" id="calcCount">0</div>
+            <div class="stat-label">Calculations</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="moneyLost">$0.00</div>
+            <div class="stat-label">Precision Lost</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="accuracy">~50%</div>
+            <div class="stat-label">Accuracy</div>
+        </div>
+    </div>
+
+    <div class="features-table">
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Free</th>
+                <th>Basic</th>
+                <th>Premium</th>
+                <th>Diamond</th>
+            </tr>
+            <tr>
+                <td>Addition & Subtraction</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+            </tr>
+            <tr>
+                <td>Multiplication</td>
+                <td class="cross">~ish</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+            </tr>
+            <tr>
+                <td>Division</td>
+                <td class="cross">~ish</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+            </tr>
+            <tr>
+                <td>The number 0</td>
+                <td class="cross">✗</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+            </tr>
+            <tr>
+                <td>Decimal points</td>
+                <td class="cross">✗</td>
+                <td class="cross">✗</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+            </tr>
+            <tr>
+                <td>Decimal places shown</td>
+                <td>0</td>
+                <td>1</td>
+                <td>2</td>
+                <td>∞</td>
+            </tr>
+            <tr>
+                <td>Accuracy</td>
+                <td>~50%</td>
+                <td>~85%</td>
+                <td>99%</td>
+                <td>100%</td>
+            </tr>
+            <tr>
+                <td>Parentheses</td>
+                <td class="cross">✗</td>
+                <td class="cross">✗</td>
+                <td class="cross">✗</td>
+                <td class="check">✓</td>
+            </tr>
+            <tr>
+                <td>No Ads</td>
+                <td class="cross">✗</td>
+                <td class="cross">✗</td>
+                <td class="check">✓</td>
+                <td class="check">✓</td>
+            </tr>
+            <tr>
+                <td>Correct answers guaranteed</td>
+                <td class="cross">✗</td>
+                <td class="cross">✗</td>
+                <td class="cross">✗</td>
+                <td class="check">✓</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <h2 id="popupTitle">Feature Locked!</h2>
+            <p id="popupText">Upgrade to Basic to unlock the number 0!</p>
+            <div class="popup-buttons">
+                <button class="popup-btn cancel" onclick="closePopup()">Stay Poor</button>
+                <button class="popup-btn upgrade" onclick="showUpgrade()">Upgrade</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let expression = '';
+        let currentTier = 'free';
+        let calcCount = 0;
+        let moneyLost = 0;
+
+        const tiers = {
+            free: {
+                precision: 0,
+                accuracy: 0.5,
+                hasZero: false,
+                hasDecimal: false,
+                hasParens: false,
+                hasPercent: false,
+                showAds: true
+            },
+            basic: {
+                precision: 1,
+                accuracy: 0.85,
+                hasZero: true,
+                hasDecimal: false,
+                hasParens: false,
+                hasPercent: false,
+                showAds: true
+            },
+            premium: {
+                precision: 2,
+                accuracy: 0.99,
+                hasZero: true,
+                hasDecimal: true,
+                hasParens: false,
+                hasPercent: true,
+                showAds: false
+            },
+            diamond: {
+                precision: 10,
+                accuracy: 1,
+                hasZero: true,
+                hasDecimal: true,
+                hasParens: true,
+                hasPercent: true,
+                showAds: false
+            }
+        };
+
+        function setTier(tier) {
+            currentTier = tier;
+            document.querySelectorAll('.tier-badge').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tier-badge.${tier}`).classList.add('active');
+            updateLockedButtons();
+            updatePrecisionIndicator();
+            
+            if (tier !== 'free') {
+                createConfetti();
+            }
+            
+            // Update ad visibility
+            document.getElementById('adBanner').classList.toggle('hidden', !tiers[tier].showAds);
+            document.getElementById('upgradePrompt').style.display = tier === 'diamond' ? 'none' : 'block';
+        }
+
+        function updateLockedButtons() {
+            const tier = tiers[currentTier];
+            document.getElementById('zero').classList.toggle('locked', !tier.hasZero);
+            document.getElementById('decimal').classList.toggle('locked', !tier.hasDecimal);
+            document.getElementById('paren1').classList.toggle('locked', !tier.hasParens);
+            document.getElementById('paren2').classList.toggle('locked', !tier.hasParens);
+            document.getElementById('percent').classList.toggle('locked', !tier.hasPercent);
+        }
+
+        function updatePrecisionIndicator() {
+            const indicator = document.getElementById('precision');
+            const tier = tiers[currentTier];
+            const accuracyEl = document.getElementById('accuracy');
+            
+            if (currentTier === 'free') {
+                indicator.className = 'precision-indicator low';
+                indicator.textContent = '±50% accuracy (estimated)';
+                accuracyEl.textContent = '~50%';
+            } else if (currentTier === 'basic') {
+                indicator.className = 'precision-indicator medium';
+                indicator.textContent = '±15% accuracy';
+                accuracyEl.textContent = '~85%';
+            } else if (currentTier === 'premium') {
+                indicator.className = 'precision-indicator high';
+                indicator.textContent = '±1% accuracy';
+                accuracyEl.textContent = '~99%';
+            } else {
+                indicator.className = 'precision-indicator perfect';
+                indicator.textContent = '✨ Perfect Precision™';
+                accuracyEl.textContent = '100%';
+            }
+        }
+
+        function handleNumber(num) {
+            if (num === '0' && !tiers[currentTier].hasZero) {
+                showPopup('Zero is Premium!', 'The number 0 is locked. Upgrade to Basic ($2.99) to unlock mathematical completeness!');
+                return;
+            }
+            expression += num;
+            updateDisplay();
+        }
+
+        function handleDecimal() {
+            if (!tiers[currentTier].hasDecimal) {
+                showPopup('Decimals are Premium!', 'Decimal points require Premium ($9.99). Integers are for the masses!');
+                return;
+            }
+            expression += '.';
+            updateDisplay();
+        }
+
+        function handleOperator(op) {
+            if ((op === '(' || op === ')') && !tiers[currentTier].hasParens) {
+                showPopup('Parentheses are Diamond!', 'Order of operations is a Diamond ($49.99) exclusive feature!');
+                return;
+            }
+            if (op === '%' && !tiers[currentTier].hasPercent) {
+                showPopup('Percentages are Premium!', 'The % operator requires Premium ($9.99). Math is hard without it!');
+                return;
+            }
+            expression += op;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('expression').textContent = expression;
+        }
+
+        function clearCalc() {
+            expression = '';
+            document.getElementById('expression').textContent = '';
+            document.getElementById('result').textContent = '0';
+            document.getElementById('result').className = 'result';
+        }
+
+        function calculate() {
+            if (!expression) return;
+            
+            try {
+                // Convert display operators to JS operators
+                let evalExpr = expression
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/%/g, '/100');
+                
+                let result = eval(evalExpr);
+                const tier = tiers[currentTier];
+                const actualResult = result;
+                
+                // Apply "accuracy" based on tier (introduce errors for lower tiers)
+                if (tier.accuracy < 1) {
+                    const errorRange = (1 - tier.accuracy) * Math.abs(result);
+                    const error = (Math.random() - 0.5) * 2 * errorRange;
+                    result = result + error;
+                }
+                
+                // Apply precision limits
+                if (tier.precision === 0) {
+                    result = Math.round(result);
+                } else {
+                    result = parseFloat(result.toFixed(tier.precision));
+                }
+                
+                // Calculate "money lost" due to imprecision
+                const diff = Math.abs(actualResult - result);
+                if (diff > 0.01) {
+                    moneyLost += diff * 0.1;
+                    document.getElementById('moneyLost').textContent = '$' + moneyLost.toFixed(2);
+                }
+                
+                calcCount++;
+                document.getElementById('calcCount').textContent = calcCount;
+                
+                // Display result
+                const resultEl = document.getElementById('result');
+                
+                if (currentTier === 'diamond') {
+                    resultEl.textContent = actualResult;
+                    resultEl.className = 'result precise';
+                } else if (currentTier === 'free') {
+                    // For free tier, show the rounded number with a disclaimer
+                    resultEl.innerHTML = result + ' <span style="font-size: 0.5em; color: #ff6b6b;">(approx)</span>';
+                    resultEl.className = 'result approximate';
+                } else {
+                    resultEl.textContent = result;
+                    resultEl.className = 'result';
+                }
+                
+                // Show upgrade prompt randomly for free users
+                if (currentTier === 'free' && Math.random() > 0.5) {
+                    setTimeout(() => {
+                        showPopup('Upgrade for Accuracy!', `Your answer might be ${Math.round((1-tier.accuracy)*100)}% wrong. Premium users get the RIGHT answer!`);
+                    }, 500);
+                }
+                
+            } catch (e) {
+                document.getElementById('result').textContent = 'Error';
+                document.getElementById('result').className = 'result approximate';
+            }
+        }
+
+        function showPopup(title, text) {
+            document.getElementById('popupTitle').textContent = title;
+            document.getElementById('popupText').textContent = text;
+            document.getElementById('popup').classList.add('active');
+        }
+
+        function closePopup() {
+            document.getElementById('popup').classList.remove('active');
+        }
+
+        function showUpgrade() {
+            closePopup();
+            // Simulate "upgrade"
+            const nextTier = {
+                'free': 'basic',
+                'basic': 'premium',
+                'premium': 'diamond'
+            };
+            if (nextTier[currentTier]) {
+                setTier(nextTier[currentTier]);
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#ffd700', '#ff6b6b', '#4ade80', '#00d4ff', '#ff00ff'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.cssText = `
+                    position: fixed;
+                    width: 10px;
+                    height: 10px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    left: ${Math.random() * 100}vw;
+                    top: -10px;
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                    animation: fall ${2 + Math.random() * 2}s linear forwards;
+                `;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 4000);
+            }
+            
+            // Add falling animation
+            if (!document.getElementById('confettiStyle')) {
+                const style = document.createElement('style');
+                style.id = 'confettiStyle';
+                style.textContent = `
+                    @keyframes fall {
+                        to {
+                            transform: translateY(100vh) rotate(720deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Initialize
+        updateLockedButtons();
+        updatePrecisionIndicator();
+    </script>
+</body>
+</html>
